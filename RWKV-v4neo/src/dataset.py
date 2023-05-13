@@ -32,9 +32,9 @@ class MyDataset(Dataset):
                 self.data_size = len(self.data._bin_buffer) // 2
                 rank_zero_info(f"Data has {self.data_size} tokens.")
 
-            if args.my_qa_mask > 0:
-                self.data_pile = MMapIndexedDataset('/fsx/BlinkDL/pile/pile_20B_tokenizer_text_document')
-                self.data_pile_size = len(self.data_pile._bin_buffer) // 2
+            # if args.chatml_mask > 0:
+            #     self.data_pile = MMapIndexedDataset('/fsx/BlinkDL/pile/pile_20B_tokenizer_text_document')
+            #     self.data_pile_size = len(self.data_pile._bin_buffer) // 2
 
             if args.my_pile_stage > 0:
                 # assert self.data_size == 332115325534 and self.vocab_size == 50277
@@ -157,7 +157,7 @@ class MyDataset(Dataset):
                 if args.my_pile_stage > 0 and args.my_pile_stage != 4:
                     ii = 1 + epoch * self.samples_per_epoch + (idx * world_size) + rank
 
-                    if args.my_qa_mask > 0:
+                    if args.chatml_mask > 0:
                         ii_orig = ii
                         if ii % 2 == 0:
                             ii = (ii // 2) * args.magic_prime
@@ -174,7 +174,7 @@ class MyDataset(Dataset):
                     factor = (math.sqrt(5) - 1) / 2
                     factor = int(magic_prime * factor)
                     i = ((factor * ii * ii * ii) % magic_prime) * ctx_len
-                    if (args.my_qa_mask == 0) or (data == self.data_pile):
+                    if (args.chatml_mask == 0) or (data == self.data_pile):
                         i = i + args.my_pile_shift
                     # print(f"epoch {epoch} idx {idx} rank {rank}/{world_size} ii {ii} pos {round(i / self.data_size, 3)}")
                 else:
@@ -188,7 +188,7 @@ class MyDataset(Dataset):
                 else:
                     dix = [self.stoi[s] for s in data[i : i + req_len]]
 
-                if args.my_qa_mask == 1:
+                if args.chatml_mask == 1:
                     if data == self.data_pile:
                         z = [1] * ctx_len
                     else:
@@ -196,9 +196,9 @@ class MyDataset(Dataset):
                         z_sum = 0
                         isGood = False
                         for i in range(3, ctx_len):
-                            if dix[i] == 27 and dix[i-1] == 34 and dix[i-2] == 187 and dix[i-3] == 187:
+                            if dix[i] == 187 and dix[i-1] == 50279 and dix[i-2] == 50277:
                                 isGood = True
-                            if dix[i] == 0:
+                            if dix[i] == 50278:
                                 isGood = False
                             if isGood:
                                 z[i] = 1
@@ -218,7 +218,7 @@ class MyDataset(Dataset):
                 # else:
                 #     exit(0)
 
-                if args.my_qa_mask == 1:
+                if args.chatml_mask == 1:
                     return x, y, z
 
             return x, y

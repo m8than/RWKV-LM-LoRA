@@ -576,7 +576,7 @@ class RWKV(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         args = self.args
-        if args.my_qa_mask != 1:
+        if args.chatml_mask != 1:
             idx, targets = batch
             logits = self(idx)
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))

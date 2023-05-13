@@ -107,7 +107,7 @@ class train_callback(pl.Callback):
                     lll["kt/s"] = kt_s
                 trainer.my_wandb.log(lll, step=int(real_step))
             if args.magic_prime > 0:
-                expand_factor = 2 if args.my_qa_mask > 0 else 1
+                expand_factor = 2 if args.chatml_mask > 0 else 1
                 if int(real_step) == int(args.magic_prime * expand_factor // args.real_bsz) - 1:
                     to_save_dict = pl_module.state_dict()
                     my_save(
