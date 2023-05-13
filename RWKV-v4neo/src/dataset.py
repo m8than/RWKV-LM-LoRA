@@ -35,6 +35,9 @@ class MyDataset(Dataset):
             # if args.chatml_mask > 0:
             #     self.data_pile = MMapIndexedDataset('/fsx/BlinkDL/pile/pile_20B_tokenizer_text_document')
             #     self.data_pile_size = len(self.data_pile._bin_buffer) // 2
+            if args.chatml_mask > 0:
+                self.data_pile = None
+                self.data_pile_size = 0
 
             if args.my_pile_stage > 0:
                 # assert self.data_size == 332115325534 and self.vocab_size == 50277
