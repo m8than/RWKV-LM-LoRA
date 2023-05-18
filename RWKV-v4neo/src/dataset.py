@@ -31,6 +31,19 @@ class MyDataset(Dataset):
                 self.data = MMapIndexedDataset(args.data_file)
                 self.data_size = len(self.data._bin_buffer) // 2
                 rank_zero_info(f"Data has {self.data_size} tokens.")
+                
+            if args.seq_data != 0:
+                self.cur_doc_id = 0
+                # find all indexes of args.seq_data_sep and store their positions
+                sep_token = int(args.seq_data_sep)
+                self.seq_indexes = [0]
+                for i in range(self.data_size):
+                    if self.data[i] == sep_token:
+                        self.seq_indexes.append(i)
+                ## remove the last one
+                self.seq_indexes.pop()
+                    
+                rank_zero_info(f"Data has {len(self.seq_indexes)} documents.")
 
             # if args.chatml_mask > 0:
             #     self.data_pile = MMapIndexedDataset('/fsx/BlinkDL/pile/pile_20B_tokenizer_text_document')
@@ -185,9 +198,26 @@ class MyDataset(Dataset):
                     i = np.random.randint(0, self.data_size - req_len)
 
                 if args.data_type == "binidx":
-                    dix = data.get(idx=0, offset=i, length=req_len).astype(int)
+                    if args.seq_data != 0:
+                        if self.cur_doc_id + 1 >= len(self.seq_indexes):
+                            self.cur_doc_id = 0
+                            
+                        ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
+                        req_len = ctx_len + 1
+                        dix = data.get(idx=0, offset=self.seq_indexes[self.cur_doc_id], length=req_len).astype(int)
+                    else:
+                        dix = data.get(idx=0, offset=i, length=req_len).astype(int)
                 elif args.data_type == "numpy":
-                    dix = data[i : i + req_len]
+                    if args.seq_data != 0:
+                        if self.cur_doc_id + 1 >= len(self.seq_indexes):
+                            self.cur_doc_id = 0
+                            
+                        ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
+                        req_len = ctx_len + 1
+                        dix = data[self.seq_indexes[self.cur_doc_id] : self.seq_indexes[self.cur_doc_id] + req_len]
+                        dix = data.get(idx=0, offset=, length=req_len).astype(int)
+                    else:
+                        dix = data[i : i + req_len]
                 else:
                     dix = [self.stoi[s] for s in data[i : i + req_len]]
 
