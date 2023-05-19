@@ -18,7 +18,9 @@ python3 train.py \
   --vocab_size 50277 --ctx_len 1024 --epoch_steps 1000 --epoch_count 1000 --epoch_begin 0 --epoch_save 5 --micro_bsz 2 --n_layer 24 --n_embd 1024 --pre_ffn 0 --head_qk 0 --lr_init 1e-4 --lr_final 1e-4 --warmup_steps 0 --beta1 0.9 --beta2 0.999 --adam_eps 1e-8 --accelerator gpu --devices 1 --precision bf16 --strategy deepspeed_stage_2 --grad_cp 0 \ # all your familiar options
   --lora --lora_r 8 --lora_alpha 16 --lora_dropout 0.01 \
   --lora_load <lora checkpoint to continue training> \ # optional
-  --lora_parts=att,ffn,time,ln # configure which parts to finetune
+  --lora_parts=att,ffn,time,ln \ # configure which parts to finetune
+  --seq_data 1 \ # to sequentially train instead of random
+  --seq_data_sep 0 \ # token separating documents
 ```
 
 The `r`, `alpha` and `dropout` options are up to your choice.
