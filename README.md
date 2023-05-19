@@ -35,6 +35,7 @@ args.lora_r = 8
 args.lora_alpha = 32
 ```
 
+Sequential training has also been added, this should help longer context lengths (instead of randomly sampling data from the dataset)
 ## TODOs
 
 * Seperate model merging to allow LoRA pretrained models to be used with other RWKV inference implementation (especially [ChatRWKV](https://github.com/BlinkDL/ChatRWKV))
