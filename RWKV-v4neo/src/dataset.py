@@ -14,6 +14,11 @@ from .utils import MaybeIsPrime
 class MyDataset(Dataset):
     def __init__(self, args):
         self.args = args
+        
+        # # only updates when using seq_data, this will often be one step ahead
+        # # (I did it like this because I'm not sure of the inner workings of pytorch lightning)
+        # self.total_tokens = 0 # for sequential training
+        self.last_token_lengths = []
 
         if args.data_type == "binidx":
             self.vocab_size = args.vocab_size
@@ -113,6 +118,8 @@ class MyDataset(Dataset):
         return self.args.epoch_steps * self.args.micro_bsz
 
     def __getitem__(self, idx):
+        rank_zero_info(f"idx {idx}")
+        rank_zero_info(f"grabbing data...")
         args = self.args
         rank = self.global_rank
         epoch = self.real_epoch
@@ -205,6 +212,7 @@ class MyDataset(Dataset):
                         ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
                         req_len = ctx_len + 1
                         dix = data.get(idx=0, offset=self.seq_indexes[self.cur_doc_id], length=req_len).astype(int)
+                        self.last_token_lengths.append(req_len)
                     else:
                         dix = data.get(idx=0, offset=i, length=req_len).astype(int)
                 elif args.data_type == "numpy":
@@ -215,7 +223,7 @@ class MyDataset(Dataset):
                         ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
                         req_len = ctx_len + 1
                         dix = data[self.seq_indexes[self.cur_doc_id] : self.seq_indexes[self.cur_doc_id] + req_len]
-                        dix = data.get(idx=0, offset=, length=req_len).astype(int)
+                        self.last_token_lengths.append(req_len)
                     else:
                         dix = data[i : i + req_len]
                 else:

@@ -18,6 +18,7 @@ class train_callback(pl.Callback):
     def __init__(self, args):
         super().__init__()
         self.args = args
+        self.total_tokens = 0
 
     def on_train_batch_start(self, trainer, pl_module, batch, batch_idx):
         args = self.args
@@ -82,8 +83,19 @@ class train_callback(pl.Callback):
         args = self.args
         if trainer.is_global_zero:  # logging
             t_now = time.time_ns()
-            token_per_step = args.ctx_len * args.real_bsz
+            total_documents = -1
             real_step = trainer.global_step + args.epoch_begin * args.epoch_steps
+            if args.seq_data > 0:
+                dataset = trainer.train_dataloader.dataset.datasets
+                assert "MyDataset" in str(dataset)
+                
+                token_per_step = sum(dataset.last_token_lengths)
+                self.total_tokens += token_per_step
+                total_documents = dataset.cur_doc_id
+                dataset.last_token_lengths = []
+            else:
+                token_per_step = args.ctx_len * args.real_bsz
+                self.total_tokens = real_step * token_per_step
             kt_s = 0
             try:
                 t_cost = (t_now - trainer.my_time_ns) / 1e9
@@ -102,7 +114,11 @@ class train_callback(pl.Callback):
             # self.log("s", real_step, prog_bar=True, on_step=True)
 
             if len(args.wandb) > 0:
-                lll = {"loss": trainer.my_loss, "lr": trainer.my_lr, "Gtokens": real_step * token_per_step / 1e9}
+                lll = {"loss": trainer.my_loss, "lr": trainer.my_lr, "Gtokens": self.total_tokens / 1e9}
+                
+                if args.seq_data > 0:
+                    lll["documents"] = total_documents
+                
                 if kt_s > 0:
                     lll["kt/s"] = kt_s
                 trainer.my_wandb.log(lll, step=int(real_step))
@@ -127,6 +143,8 @@ class train_callback(pl.Callback):
 
     def on_train_epoch_end(self, trainer, pl_module):
         args = self.args
+        dataset = trainer.train_dataloader.dataset.datasets
+        assert "MyDataset" in str(dataset)
         if trainer.is_global_zero:  # logging & save state_dict
             if (args.epoch_save > 0 and trainer.current_epoch % args.epoch_save == 0) or trainer.current_epoch == args.epoch_count - 1:
                 if args.data_type == 'wds_img':
@@ -156,7 +174,11 @@ class train_callback(pl.Callback):
                     )
                 except Exception as e:
                     print('Error\n\n', e, '\n\n')
-            trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch}\n")
+            
+            if args.seq_data > 0:
+                trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch} {self.total_tokens} {dataset.cur_doc_id}\n")
+            else:
+                trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch} {self.total_tokens}\n")
             trainer.my_log.flush()
 
             trainer.my_loss_sum = 0
