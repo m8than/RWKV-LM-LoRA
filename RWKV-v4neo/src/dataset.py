@@ -135,7 +135,8 @@ class MyDataset(Dataset):
         rank = self.global_rank
         epoch = self.real_epoch
         world_size = self.world_size
-        # print(f"epoch {epoch} idx {idx} rank {rank}/{world_size}")
+        print(f"epoch {epoch} idx {idx} rank {rank}/{world_size}")
+        print(f"doc {self.cur_doc_id} ctx {self.last_ctx_length}")
 
         if args.data_type == "wds_img":
             def init_wds(self, bias=0):
