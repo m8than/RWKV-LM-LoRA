@@ -369,19 +369,25 @@ if __name__ == "__main__":
         trainer.strategy.config["zero_optimization"]["allgather_bucket_size"] = args.ds_bucket_mb * 1000 * 1000
         trainer.strategy.config["zero_optimization"]["reduce_bucket_size"] = args.ds_bucket_mb * 1000 * 1000
     
-    def pad_zip(*sequences, pad_value=0):
-        max_len = max(len(seq) for seq in sequences)
+    def pad_zip(*sequences, pad_value=None):
+        max_rows = max(len(seq) for seq in sequences)
+        max_cols = max(len(row) for seq in sequences for row in seq)
         padded_sequences = []
         for seq in sequences:
-            if len(seq) < max_len:
-                padded_seq = list(seq) + [pad_value] * (max_len - len(seq))
-            else:
-                padded_seq = list(seq)
+            padded_seq = []
+            for row in seq:
+                if len(row) < max_cols:
+                    padded_row = list(row) + [pad_value] * (max_cols - len(row))
+                else:
+                    padded_row = list(row)
+                padded_seq.append(padded_row + [pad_value] * (max_cols - len(padded_row)))
+            if len(seq) < max_rows:
+                padded_seq += [[pad_value] * max_cols] * (max_rows - len(seq))
             padded_sequences.append(padded_seq)
         return zip(*padded_sequences)
     
     def my_collate_fn(batch):
-        return list(pad_zip(*batch))
+        return list(pad_zip(*batch), pad_value=torch.tensor(-1))
 
     # must set shuffle=False, persistent_workers=False (because worker is in another thread)
     data_loader = DataLoader(train_data, shuffle=False, pin_memory=True, batch_size=args.micro_bsz, num_workers=1, persistent_workers=False, drop_last=True)
