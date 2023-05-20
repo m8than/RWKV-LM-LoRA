@@ -19,6 +19,7 @@ class train_callback(pl.Callback):
         super().__init__()
         self.args = args
         self.last_documents = 0
+        self.total_tokens = 0
 
     def on_train_batch_start(self, trainer, pl_module, batch, batch_idx):
         args = self.args
