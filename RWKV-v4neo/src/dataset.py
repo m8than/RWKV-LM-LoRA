@@ -43,7 +43,7 @@ class MyDataset(Dataset):
                 sep_token = int(args.seq_data_sep)
                 self.seq_indexes = [0]
                 chunk_size = args.ctx_len * 10 if args.ctx_len * 10 < self.data_size else self.data_size
-                rank_zero_info("Preprocessing data...")
+                rank_zero_info("Preprocessing data...\r")
                 
                 for i in range(0, self.data_size, chunk_size):
                     chunk = self.data.get(idx=0, offset=i, length=chunk_size).astype(int)
@@ -51,7 +51,6 @@ class MyDataset(Dataset):
                         if chunk[j] == sep_token:
                             self.seq_indexes.append(i+j)
                     # delete the last line output
-                    sys.stdout.write("\033[F") 
                     rank_zero_info(f"Preprocessed {i} tokens...")
                         
                 ## remove the last one
