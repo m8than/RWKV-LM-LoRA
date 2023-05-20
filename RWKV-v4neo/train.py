@@ -370,6 +370,7 @@ if __name__ == "__main__":
         trainer.strategy.config["zero_optimization"]["reduce_bucket_size"] = args.ds_bucket_mb * 1000 * 1000
     
     def pad_zip(*sequences, pad_value=None):
+        sequences = list(sequences)
         for batch in sequences:
             print(batch)
             for i in range(len(batch)):
