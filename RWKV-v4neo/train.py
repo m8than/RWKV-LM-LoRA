@@ -371,12 +371,15 @@ if __name__ == "__main__":
     
     def pad_zip(*sequences, pad_value=None):
         sequences = list(sequences)
+        new_sequences = []
         for j in range(len(sequences)):
             batch = sequences[j]
+            new_batch = []
             for i in range(len(batch)):
                 length = max(int(bch[i].size()[0]) for bch in sequences)
-                batch[i] = torch.nn.functional.pad(batch[i], (0, length), mode='constant', value=0)
-        return zip(*sequences)
+                new_batch[i] = torch.nn.functional.pad(batch[i], (0, length), mode='constant', value=0)
+            new_sequences.append(new_batch)
+        return zip(*tuple(new_sequences))
     
     def my_collate_fn(batch):
         return pad_zip(*batch)
