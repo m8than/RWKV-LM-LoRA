@@ -370,28 +370,18 @@ if __name__ == "__main__":
         trainer.strategy.config["zero_optimization"]["reduce_bucket_size"] = args.ds_bucket_mb * 1000 * 1000
     
     def pad_zip(*sequences, pad_value=None):
-        max_rows = max(len(seq) for seq in sequences)
-        max_cols = max(len(row) for seq in sequences for row in seq)
-        padded_sequences = []
-        for seq in sequences:
-            padded_seq = []
-            for row in seq:
-                if len(row) < max_cols:
-                    padded_row = torch.cat((row, torch.full((max_cols - len(row),), pad_value)))
-                else:
-                    padded_row = row
-                padded_seq.append(torch.cat((padded_row, torch.full((max_cols - len(padded_row),), pad_value))))
-            if len(seq) < max_rows:
-                padded_seq += [torch.full((max_cols,), pad_value)] * (max_rows - len(seq))
-            padded_sequences.append(padded_seq)
-        return zip(*padded_sequences)
+        for batch in sequences:
+            for i in range(len(batch)):
+                length = max(len(pt[i]) for pt in batch)
+                batch[i] = torch.nn.functional.pad(batch[i], (0, length), mode='constant', value=0)
+        return zip(*sequences)
     
     def my_collate_fn(batch):
-        return list(pad_zip(*batch, pad_value=torch.tensor(-1)))
+        return pad_zip(*batch)
 
     # must set shuffle=False, persistent_workers=False (because worker is in another thread)
     data_loader = DataLoader(train_data, shuffle=False, pin_memory=True, batch_size=args.micro_bsz, num_workers=1, persistent_workers=False, drop_last=True)
-    if args.seq_data == 1:
+    if args.seq_data == 1 and (args.micro_bsz > 1 or args.devices > 1):
         data_loader.collate_fn = my_collate_fn
         
     trainer.fit(model, data_loader)
