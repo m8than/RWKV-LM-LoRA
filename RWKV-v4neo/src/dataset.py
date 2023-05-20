@@ -38,7 +38,7 @@ class MyDataset(Dataset):
                 rank_zero_info(f"Data has {self.data_size} tokens.")
                 
             if args.seq_data != 0:
-                self.cur_doc_id = 0
+                self.total_documents = 0
                 # find all indexes of args.seq_data_sep and store their positions
                 sep_token = int(args.seq_data_sep)
                 self.seq_indexes = [0]
@@ -206,8 +206,7 @@ class MyDataset(Dataset):
 
                 if args.data_type == "binidx":
                     if args.seq_data != 0:
-                        if self.cur_doc_id + 1 >= len(self.seq_indexes):
-                            self.cur_doc_id = 0
+                        self.cur_doc_id = self.total_documents % len(self.seq_indexes)
                             
                         ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
                         req_len = ctx_len + 1
@@ -217,8 +216,7 @@ class MyDataset(Dataset):
                         dix = data.get(idx=0, offset=i, length=req_len).astype(int)
                 elif args.data_type == "numpy":
                     if args.seq_data != 0:
-                        if self.cur_doc_id + 1 >= len(self.seq_indexes):
-                            self.cur_doc_id = 0
+                        self.cur_doc_id = self.total_documents % len(self.seq_indexes)
                             
                         ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
                         req_len = ctx_len + 1

@@ -18,7 +18,7 @@ class train_callback(pl.Callback):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.total_tokens = 0
+        self.last_documents = 0
 
     def on_train_batch_start(self, trainer, pl_module, batch, batch_idx):
         args = self.args
@@ -91,8 +91,11 @@ class train_callback(pl.Callback):
                 
                 token_per_step = sum(dataset.last_token_lengths)
                 self.total_tokens += token_per_step
-                total_documents = dataset.cur_doc_id
+                total_documents = int(dataset.total_documents)
+                docs_per_step = total_documents - self.last_documents
+                self.last_documents = total_documents
                 dataset.last_token_lengths = []
+                self.log("Docs", total_documents, prog_bar=True, on_step=True)
             else:
                 token_per_step = args.ctx_len * args.real_bsz
                 self.total_tokens = real_step * token_per_step
@@ -102,6 +105,10 @@ class train_callback(pl.Callback):
                 kt_s = token_per_step / t_cost / 1000
                 self.log("REAL it/s", 1.0 / t_cost, prog_bar=True, on_step=True)
                 self.log("Kt/s", kt_s, prog_bar=True, on_step=True)
+                
+                if args.seq_data > 0:
+                    d_s = docs_per_step / t_cost / 1000
+                    self.log("D/s", docs_per_step / t_cost, prog_bar=True, on_step=True)
             except:
                 pass
             trainer.my_time_ns = t_now
