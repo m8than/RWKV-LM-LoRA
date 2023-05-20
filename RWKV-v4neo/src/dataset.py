@@ -20,7 +20,7 @@ class MyDataset(Dataset):
         # self.total_tokens = 0 # for sequential training
         self.last_token_lengths = []
         self.last_ctx_length = 0 if args.seq_data != 0 else args.ctx_len
-        self.cur_doc_id = 0
+        self.total_documents = 0
 
         if args.data_type == "binidx":
             self.vocab_size = args.vocab_size
@@ -136,7 +136,7 @@ class MyDataset(Dataset):
         epoch = self.real_epoch
         world_size = self.world_size
         print(f"epoch {epoch} idx {idx} rank {rank}/{world_size}")
-        print(f"doc {self.cur_doc_id} ctx {self.last_ctx_length}")
+        print(f"doc {self.total_documents} ctx {self.last_ctx_length}")
 
         if args.data_type == "wds_img":
             def init_wds(self, bias=0):
@@ -218,26 +218,26 @@ class MyDataset(Dataset):
 
                 if args.data_type == "binidx":
                     if args.seq_data != 0:
-                        self.cur_doc_id = self.total_documents % len(self.seq_indexes)
+                        cur_doc_id = self.total_documents % len(self.seq_indexes)
                             
-                        ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
+                        ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
                         self.last_ctx_length = ctx_len
-                        dix = data.get(idx=0, offset=self.seq_indexes[self.cur_doc_id], length=req_len).astype(int)
-                        self.cur_doc_id += 1
-                        self.last_token_lengths.append(req_len)
+                        dix = data.get(idx=0, offset=self.seq_indexes[cur_doc_id], length=req_len).astype(int)
+                        self.total_documents += 1
+                        self.last_token_lengths.append(ctx_len)
                     else:
                         dix = data.get(idx=0, offset=i, length=req_len).astype(int)
                 elif args.data_type == "numpy":
                     if args.seq_data != 0:
-                        self.cur_doc_id = self.total_documents % len(self.seq_indexes)
+                        cur_doc_id = self.total_documents % len(self.seq_indexes)
                             
-                        ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
+                        ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
                         self.last_ctx_length = ctx_len
-                        dix = data[self.seq_indexes[self.cur_doc_id] : self.seq_indexes[self.cur_doc_id] + req_len]
-                        self.cur_doc_id += 1
-                        self.last_token_lengths.append(req_len)
+                        dix = data[self.seq_indexes[cur_doc_id] : self.seq_indexes[cur_doc_id] + req_len]
+                        self.total_documents += 1
+                        self.last_token_lengths.append(ctx_len)
                     else:
                         dix = data[i : i + req_len]
                 else:
