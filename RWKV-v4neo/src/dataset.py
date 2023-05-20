@@ -19,7 +19,7 @@ class MyDataset(Dataset):
         # # (I did it like this because I'm not sure of the inner workings of pytorch lightning)
         # self.total_tokens = 0 # for sequential training
         self.last_token_lengths = []
-        self.last_ctx_length = 0 if args.seq_data == 0 else args.ctx_len
+        self.last_ctx_length = 0 if args.seq_data != 0 else args.ctx_len
 
         if args.data_type == "binidx":
             self.vocab_size = args.vocab_size
@@ -53,6 +53,9 @@ class MyDataset(Dataset):
                     for j in range(len(chunk)):
                         if chunk[j] == sep_token:
                             self.seq_indexes.append(i+j)
+                            
+                # output first 10 indexes
+                rank_zero_info(self.seq_indexes[:10])
                         
                 ## remove the last one
                 self.seq_indexes.pop()
@@ -127,8 +130,6 @@ class MyDataset(Dataset):
         return self.args.epoch_steps * self.args.micro_bsz
 
     def __getitem__(self, idx):
-        rank_zero_info(f"idx {idx}")
-        rank_zero_info(f"grabbing data...")
         args = self.args
         rank = self.global_rank
         epoch = self.real_epoch
@@ -230,6 +231,7 @@ class MyDataset(Dataset):
                             
                         ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
                         req_len = ctx_len + 1
+                        self.last_ctx_length = ctx_len
                         dix = data[self.seq_indexes[self.cur_doc_id] : self.seq_indexes[self.cur_doc_id] + req_len]
                         self.last_token_lengths.append(req_len)
                     else:
