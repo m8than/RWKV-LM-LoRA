@@ -224,6 +224,7 @@ class MyDataset(Dataset):
                         req_len = ctx_len + 1
                         self.last_ctx_length = ctx_len
                         dix = data.get(idx=0, offset=self.seq_indexes[self.cur_doc_id], length=req_len).astype(int)
+                        self.cur_doc_id += 1
                         self.last_token_lengths.append(req_len)
                     else:
                         dix = data.get(idx=0, offset=i, length=req_len).astype(int)
@@ -235,6 +236,7 @@ class MyDataset(Dataset):
                         req_len = ctx_len + 1
                         self.last_ctx_length = ctx_len
                         dix = data[self.seq_indexes[self.cur_doc_id] : self.seq_indexes[self.cur_doc_id] + req_len]
+                        self.cur_doc_id += 1
                         self.last_token_lengths.append(req_len)
                     else:
                         dix = data[i : i + req_len]
