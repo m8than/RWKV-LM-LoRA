@@ -369,6 +369,7 @@ if __name__ == "__main__":
         trainer.strategy.config["zero_optimization"]["allgather_bucket_size"] = args.ds_bucket_mb * 1000 * 1000
         trainer.strategy.config["zero_optimization"]["reduce_bucket_size"] = args.ds_bucket_mb * 1000 * 1000
     
+    # fix this shit ffffsssss
     def pad_zip(*sequences, pad_value=None):
         sequences = list(sequences)
         new_sequences = []
@@ -386,7 +387,7 @@ if __name__ == "__main__":
 
     # must set shuffle=False, persistent_workers=False (because worker is in another thread)
     data_loader = DataLoader(train_data, shuffle=False, pin_memory=True, batch_size=args.micro_bsz, num_workers=1, persistent_workers=False, drop_last=True)
-    if args.seq_data == 1 and (args.micro_bsz > 1 or args.devices > 1):
+    if args.seq_data == 1 and (int(args.micro_bsz) > 1 or int(args.devices) > 1):
         data_loader.collate_fn = my_collate_fn
         
     trainer.fit(model, data_loader)
