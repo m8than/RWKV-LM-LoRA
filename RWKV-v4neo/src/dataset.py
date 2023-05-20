@@ -50,6 +50,8 @@ class MyDataset(Dataset):
                     for j in range(len(chunk)):
                         if chunk[j] == sep_token:
                             self.seq_indexes.append(i+j)
+                    # delete the last line output
+                    sys.stdout.write("\033[F") 
                     rank_zero_info(f"Preprocessed {i} tokens...")
                         
                 ## remove the last one
