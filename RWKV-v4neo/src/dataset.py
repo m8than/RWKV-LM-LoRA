@@ -42,9 +42,13 @@ class MyDataset(Dataset):
                 # find all indexes of args.seq_data_sep and store their positions
                 sep_token = int(args.seq_data_sep)
                 self.seq_indexes = [0]
+                # get all data as array of ints
+                data = self.data._bin_buffer.view(np.int32)
                 for i in range(self.data_size):
-                    if self.data.get(idx=0, offset=i, length=1).astype(int) == sep_token:
+                    if data[i] == sep_token:
                         self.seq_indexes.append(i)
+                
+                del data
                 ## remove the last one
                 self.seq_indexes.pop()
                     
