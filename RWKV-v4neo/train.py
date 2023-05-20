@@ -380,7 +380,7 @@ if __name__ == "__main__":
                     padded_row = torch.cat((row, torch.full((max_cols - len(row),), pad_value)))
                 else:
                     padded_row = row
-                padded_seq.append(torch.cat((padded_row, torch.full((max_cols - len(padded_row),), pad_value)))))
+                padded_seq.append(torch.cat((padded_row, torch.full((max_cols - len(padded_row),), pad_value))))
             if len(seq) < max_rows:
                 padded_seq += [torch.full((max_cols,), pad_value)] * (max_rows - len(seq))
             padded_sequences.append(padded_seq)
