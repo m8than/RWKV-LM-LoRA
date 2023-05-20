@@ -371,8 +371,9 @@ if __name__ == "__main__":
     
     def pad_zip(*sequences, pad_value=None):
         for batch in sequences:
+            print(batch)
             for i in range(len(batch)):
-                length = max(int(pt[i].size()[0]) for pt in batch)
+                length = max(int(bch[i].size()[0]) for bch in sequences)
                 batch[i] = torch.nn.functional.pad(batch[i], (0, length), mode='constant', value=0)
         return zip(*sequences)
     
