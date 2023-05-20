@@ -371,7 +371,7 @@ if __name__ == "__main__":
     
     def pad_zip(*sequences, pad_value=None):
         sequences = list(sequences)
-        for j in len(sequences):
+        for j in range(len(sequences)):
             batch = sequences[j]
             for i in range(len(batch)):
                 length = max(int(bch[i].size()[0]) for bch in sequences)
