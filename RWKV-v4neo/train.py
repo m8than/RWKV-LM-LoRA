@@ -377,7 +377,7 @@ if __name__ == "__main__":
             new_batch = []
             for i in range(len(batch)):
                 length = max(int(bch[i].size()[0]) for bch in sequences)
-                new_batch[i] = torch.nn.functional.pad(batch[i], (0, length), mode='constant', value=0)
+                new_batch.append(torch.nn.functional.pad(batch[i], (0, length), mode='constant', value=0))
             new_sequences.append(new_batch)
         return zip(*tuple(new_sequences))
     
