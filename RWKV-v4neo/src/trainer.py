@@ -94,6 +94,7 @@ class train_callback(pl.Callback):
                 total_documents = int(dataset.total_documents)
                 docs_per_step = total_documents - self.last_documents
                 self.last_documents = total_documents
+                self.log("Ctx length", dataset.last_token_lengths[-1], prog_bar=True, on_step=True)
                 dataset.last_token_lengths = []
                 self.log("Docs", total_documents, prog_bar=True, on_step=True)
             else:
