@@ -43,7 +43,7 @@ class MyDataset(Dataset):
                 sep_token = int(args.seq_data_sep)
                 self.seq_indexes = [0]
                 for i in range(self.data_size):
-                    if self.data[i] == sep_token:
+                    if self.data.get(idx=0, offset=i, length=1).astype(int) == sep_token:
                         self.seq_indexes.append(i)
                 ## remove the last one
                 self.seq_indexes.pop()
