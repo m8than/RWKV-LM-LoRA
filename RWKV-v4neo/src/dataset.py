@@ -42,7 +42,7 @@ class MyDataset(Dataset):
                 # find all indexes of args.seq_data_sep and store their positions
                 sep_token = int(args.seq_data_sep)
                 self.seq_indexes = [0]
-                chunk_size = args.ctx_len * 10 if args.ctx_len * 10 < self.data_size else self.data_size
+                chunk_size = args.ctx_len * 30 if args.ctx_len * 10 < self.data_size else self.data_size
                 rank_zero_info("Preprocessing data...")
                 
                 for i in range(0, self.data_size, chunk_size):
