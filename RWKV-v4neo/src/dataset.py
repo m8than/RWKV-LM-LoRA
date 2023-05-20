@@ -20,6 +20,7 @@ class MyDataset(Dataset):
         # self.total_tokens = 0 # for sequential training
         self.last_token_lengths = []
         self.last_ctx_length = 0 if args.seq_data != 0 else args.ctx_len
+        self.cur_doc_id = 0
 
         if args.data_type == "binidx":
             self.vocab_size = args.vocab_size
