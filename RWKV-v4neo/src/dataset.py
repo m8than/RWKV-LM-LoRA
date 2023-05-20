@@ -48,7 +48,7 @@ class MyDataset(Dataset):
                 for i in range(0, self.data_size, chunk_size):
                     chunk = self.data.get(idx=0, offset=i, length=chunk_size).astype(int)
                     for j in range(len(chunk)):
-                        if chunk(j) == sep_token:
+                        if chunk[j] == sep_token:
                             self.seq_indexes.append(i+j)
                     rank_zero_info(f"Preprocessed {i} tokens...")
                         
