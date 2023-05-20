@@ -387,7 +387,7 @@ if __name__ == "__main__":
         return zip(*padded_sequences)
     
     def my_collate_fn(batch):
-        return list(pad_zip(*batch), pad_value=torch.tensor(-1))
+        return list(pad_zip(*batch, pad_value=torch.tensor(-1)))
 
     # must set shuffle=False, persistent_workers=False (because worker is in another thread)
     data_loader = DataLoader(train_data, shuffle=False, pin_memory=True, batch_size=args.micro_bsz, num_workers=1, persistent_workers=False, drop_last=True)
