@@ -19,6 +19,7 @@ class MyDataset(Dataset):
         # # (I did it like this because I'm not sure of the inner workings of pytorch lightning)
         # self.total_tokens = 0 # for sequential training
         self.last_token_lengths = []
+        self.last_ctx_length = 0 if args.seq_data == 0 else args.ctx_len
 
         if args.data_type == "binidx":
             self.vocab_size = args.vocab_size
@@ -218,6 +219,7 @@ class MyDataset(Dataset):
                             
                         ctx_len = self.seq_indexes[self.cur_doc_id + 1] - self.seq_indexes[self.cur_doc_id]
                         req_len = ctx_len + 1
+                        self.last_ctx_length = ctx_len
                         dix = data.get(idx=0, offset=self.seq_indexes[self.cur_doc_id], length=req_len).astype(int)
                         self.last_token_lengths.append(req_len)
                     else:
