@@ -370,6 +370,7 @@ if __name__ == "__main__":
         trainer.strategy.config["zero_optimization"]["reduce_bucket_size"] = args.ds_bucket_mb * 1000 * 1000
         
     def my_collate_fn(batch):
+        print(batch)
         return tuple(batch)
 
     # must set shuffle=False, persistent_workers=False (because worker is in another thread)
