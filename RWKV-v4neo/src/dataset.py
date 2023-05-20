@@ -274,6 +274,7 @@ class MyDataset(Dataset):
                 #     exit(0)
 
                 if args.chatml_mask == 1:
+                    print("wtf")
                     return x, y, z
 
             return x, y
