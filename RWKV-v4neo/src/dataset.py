@@ -46,6 +46,8 @@ class MyDataset(Dataset):
                 rank_zero_info("Preprocessing data...")
                 
                 for i in range(0, self.data_size, chunk_size):
+                    if i + chunk_size > self.data_size:
+                        chunk_size = self.data_size - i
                     chunk = self.data.get(idx=0, offset=i, length=chunk_size).astype(int)
                     for j in range(len(chunk)):
                         if chunk[j] == sep_token:
