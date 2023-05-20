@@ -43,11 +43,14 @@ class MyDataset(Dataset):
                 sep_token = int(args.seq_data_sep)
                 self.seq_indexes = [0]
                 chunk_size = args.ctx_len if args.ctx_len > self.data_size else self.data_size
+                rank_zero_info("Preprocessing data...")
+                
                 for i in range(0, self.data_size, chunk_size):
                     chunk = self.data.get(idx=0, offset=i, length=chunk_size).astype(int)
                     for j in range(len(chunk)):
                         if chunk(j) == sep_token:
                             self.seq_indexes.append(i+j)
+                    rank_zero_info(f"Preprocessed {i} tokens...")
                         
                 ## remove the last one
                 self.seq_indexes.pop()
