@@ -14,12 +14,12 @@ def my_save(dd, ff):
         torch.save(dd, fff)
         subprocess.Popen(f" aws s3 mv {fff} s3://rwkv-14b-4k/{fn} --quiet", shell=True)
 
+import src.registry
 class train_callback(pl.Callback):
     def __init__(self, args):
-        global registry
         super().__init__()
         self.args = args
-        self.registry = registry
+        self.registry = src.registry.registry
         self.last_documents = 0
         self.total_tokens = 0
 

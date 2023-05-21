@@ -9,13 +9,13 @@ from torch.utils.data import Dataset
 from pytorch_lightning.utilities import rank_zero_info
 from .binidx import MMapIndexedDataset
 from .utils import MaybeIsPrime
+import src.registry
 
 
 class MyDataset(Dataset):
     def __init__(self, args):
-        global registry
         self.args = args
-        self.registry = registry
+        self.registry = src.registry.registry
 
         if args.data_type == "binidx":
             self.vocab_size = args.vocab_size

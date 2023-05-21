@@ -282,11 +282,10 @@ if __name__ == "__main__":
 
     from src.trainer import train_callback, generate_init_weight
     from src.dataset import MyDataset
-    from src.registry import Registry
+    import src.registry
     
     # create object to store registry of data
-    registry = Registry()
-    registry.setup()
+    src.registry.initRegistry()
 
     train_data = MyDataset(args)
     args.vocab_size = train_data.vocab_size
