@@ -150,8 +150,6 @@ class train_callback(pl.Callback):
 
     def on_train_epoch_end(self, trainer, pl_module):
         args = self.args
-        dataset = trainer.train_dataloader.dataset.datasets
-        assert "MyDataset" in str(dataset)
         if trainer.is_global_zero:  # logging & save state_dict
             if (args.epoch_save > 0 and trainer.current_epoch % args.epoch_save == 0) or trainer.current_epoch == args.epoch_count - 1:
                 if args.data_type == 'wds_img':
@@ -183,7 +181,7 @@ class train_callback(pl.Callback):
                     print('Error\n\n', e, '\n\n')
             
             if args.seq_data > 0:
-                trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch} {self.total_tokens} {dataset.total_documents}\n")
+                trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch} {self.total_tokens} {self.registry.total_documents}\n")
             else:
                 trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch} {self.total_tokens}\n")
             trainer.my_log.flush()
