@@ -383,6 +383,7 @@ if __name__ == "__main__":
         return tuple(new_sequences)
     
     def my_collate_fn(batch):
+        print(batch)
         print(pad_zip(*batch))
         return pad_zip(*batch)
 
