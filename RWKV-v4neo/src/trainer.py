@@ -86,6 +86,7 @@ class train_callback(pl.Callback):
         if trainer.is_global_zero:  # logging            
             t_now = time.time_ns()
             real_step = trainer.global_step + args.epoch_begin * args.epoch_steps
+            last_ctx_length = max(int(bch[0].size(0)) for bch in batch)
             if args.seq_data > 0:
                 token_per_step = sum(int(bch[0].size(0)) for bch in batch)
                 self.total_tokens += token_per_step
@@ -127,6 +128,7 @@ class train_callback(pl.Callback):
                     self.last_documents = total_documents
                     lll["documents"] = total_documents
                     lll["docs/s"] = docs_s
+                    lll["ctx_len"] = last_ctx_length
                 
                 if kt_s > 0:
                     lll["kt/s"] = kt_s
