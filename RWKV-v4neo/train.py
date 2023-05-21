@@ -381,7 +381,7 @@ if __name__ == "__main__":
             for i in range(len(batch)):
                 max_length = max(int(bch[i].size(0)) for bch in sequences)
                 current_length = int(batch[i].size(0))
-                new_tensor = torch.cat((batch[i], torch.full(max_length - current_length, 0 if len(batch) == 3 else -1, dtype=batch[i].dtype))).long()
+                new_tensor = torch.cat((batch[i], torch.zeros(max_length - current_length, dtype=batch[i].dtype))).long()
                 new_sequences[i] = torch.cat((new_sequences[i], new_tensor.unsqueeze(0))).long()
                 
         return new_sequences
