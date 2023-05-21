@@ -2,12 +2,6 @@
 # The RWKV Language Model - https://github.com/BlinkDL/RWKV-LM
 ########################################################################################################
 
-from src.registry import Registry
-
-# create object to store registry of data
-registry = Registry()
-registry.setup()
-
 if __name__ == "__main__":
     from argparse import ArgumentParser
     from pytorch_lightning import Trainer
@@ -288,8 +282,13 @@ if __name__ == "__main__":
 
     from src.trainer import train_callback, generate_init_weight
     from src.dataset import MyDataset
+    from src.registry import Registry
+    
+    # create object to store registry of data
+    registry = Registry()
+    registry.setup()
 
-    train_data = MyDataset(args, registry)
+    train_data = MyDataset(args)
     args.vocab_size = train_data.vocab_size
 
     if args.data_type == 'wds_img':
@@ -359,7 +358,7 @@ if __name__ == "__main__":
 
     trainer = Trainer.from_argparse_args(
         args,
-        callbacks=[train_callback(args, registry)],
+        callbacks=[train_callback(args)],
     )
 
     if trainer.global_rank == 0:

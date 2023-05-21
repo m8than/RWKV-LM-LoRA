@@ -12,7 +12,8 @@ from .utils import MaybeIsPrime
 
 
 class MyDataset(Dataset):
-    def __init__(self, args, registry):
+    def __init__(self, args):
+        global registry
         self.args = args
         self.registry = registry
 

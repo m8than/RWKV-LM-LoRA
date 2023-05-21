@@ -15,7 +15,8 @@ def my_save(dd, ff):
         subprocess.Popen(f" aws s3 mv {fff} s3://rwkv-14b-4k/{fn} --quiet", shell=True)
 
 class train_callback(pl.Callback):
-    def __init__(self, args, registry):
+    def __init__(self, args):
+        global registry
         super().__init__()
         self.args = args
         self.registry = registry
