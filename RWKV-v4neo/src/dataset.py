@@ -45,7 +45,7 @@ class MyDataset(Dataset):
                     chunk = self.data.get(idx=0, offset=i, length=chunk_size).astype(int)
                     for j in range(len(chunk)):
                         if chunk[j] == sep_token:
-                            self.seq_indexes.append(i+j)
+                            self.seq_indexes.append(i+j+1)
                             
                 # output first 10 indexes
                 rank_zero_info(self.seq_indexes[:10])

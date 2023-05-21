@@ -82,15 +82,12 @@ class train_callback(pl.Callback):
 
     def on_train_batch_end(self, trainer, pl_module, outputs, batch, batch_idx):
         args = self.args
-        print("on_train_batch_end")
-        print(batch)
-        print(batch_idx)
-        if trainer.is_global_zero:  # logging
+        
+        if trainer.is_global_zero:  # logging            
             t_now = time.time_ns()
             real_step = trainer.global_step + args.epoch_begin * args.epoch_steps
             if args.seq_data > 0:
-                token_per_step = 5
-                self.total_tokens += token_per_step
+                self.total_tokens += sum(int(bch[0].size(0)) for bch in batch)
             else:
                 token_per_step = args.ctx_len * args.real_bsz
                 self.total_tokens = real_step * token_per_step
@@ -117,7 +114,10 @@ class train_callback(pl.Callback):
                 if args.seq_data > 0:
                     t_cost = (t_now - trainer.my_time_ns) / 1e9
                     total_documents = int(real_step * args.real_bsz)
-                    docs_s = (total_documents - self.last_documents) / t_cost
+                    if t_cost > 0:
+                        docs_s = (total_documents - self.last_documents) / t_cost
+                    else:
+                        docs_s = 0
                     self.last_documents = total_documents
                     lll["documents"] = total_documents
                     lll["docs/s"] = docs_s
