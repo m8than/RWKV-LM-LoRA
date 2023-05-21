@@ -372,6 +372,7 @@ if __name__ == "__main__":
     # fix this shit ffffsssss
 
 
+
     def pad_zip(*sequences):
         sequences = list(sequences)
         new_sequences = []
@@ -381,9 +382,11 @@ if __name__ == "__main__":
             for i in range(len(batch)):
                 max_length = max(int(bch[i].size(0)) for bch in sequences)
                 current_length = int(batch[i].size(0))
-                new_batch.append(torch.cat((batch[i], torch.zeros(max_length - current_length, dtype=batch[i].dtype))))
-            new_sequences.append(tuple(new_batch))
-        return zip(*new_sequences)
+                new_batch.append(torch.cat((batch[i], torch.zeros(max_length - current_length, dtype=batch[i].dtype))).long())
+            new_sequences.append(new_batch)
+            
+        tensor_of_tensors = torch.stack([torch.stack(batch) for batch in new_sequences])
+        return tensor_of_tensors
     
     def my_collate_fn(batch):
         return pad_zip(*batch)
