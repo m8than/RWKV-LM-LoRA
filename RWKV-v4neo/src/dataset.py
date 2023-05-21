@@ -128,6 +128,9 @@ class MyDataset(Dataset):
         rank = self.global_rank
         epoch = self.real_epoch
         world_size = self.world_size
+        
+        docs_per_epoch = args.real_bsz * args.epoch_steps
+        registry.total_documents = int(epoch * docs_per_epoch + idx)
         print()
         print(f"epoch {epoch} idx {idx} rank {rank}/{world_size}")
         print(f"doc {registry.total_documents} ctx {registry.last_ctx_length}")
