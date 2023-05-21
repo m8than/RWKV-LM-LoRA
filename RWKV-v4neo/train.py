@@ -286,6 +286,7 @@ if __name__ == "__main__":
     
     # create object to store registry of data
     registry = Registry()
+    registry.setup()
 
     train_data = MyDataset(args, registry)
     args.vocab_size = train_data.vocab_size
