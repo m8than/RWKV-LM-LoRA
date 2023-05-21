@@ -14,12 +14,11 @@ def my_save(dd, ff):
         torch.save(dd, fff)
         subprocess.Popen(f" aws s3 mv {fff} s3://rwkv-14b-4k/{fn} --quiet", shell=True)
 
-import src.registry
+from src.registry import registry
 class train_callback(pl.Callback):
     def __init__(self, args):
         super().__init__()
         self.args = args
-        self.registry = src.registry.registry
         self.last_documents = 0
         self.total_tokens = 0
 
@@ -88,7 +87,7 @@ class train_callback(pl.Callback):
             t_now = time.time_ns()
             real_step = trainer.global_step + args.epoch_begin * args.epoch_steps
             if args.seq_data > 0:
-                token_per_step = sum(self.registry.last_token_lengths)
+                token_per_step = sum(registry.last_token_lengths)
                 self.total_tokens += token_per_step
             else:
                 token_per_step = args.ctx_len * args.real_bsz
@@ -114,7 +113,7 @@ class train_callback(pl.Callback):
                 lll = {"loss": trainer.my_loss, "lr": trainer.my_lr, "Gtokens": self.total_tokens / 1e9}
                 
                 if args.seq_data > 0:
-                    lll["documents"] = self.registry.total_documents
+                    lll["documents"] = registry.total_documents
                 
                 if kt_s > 0:
                     lll["kt/s"] = kt_s
