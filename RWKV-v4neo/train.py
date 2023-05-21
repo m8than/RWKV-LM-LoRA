@@ -392,7 +392,7 @@ if __name__ == "__main__":
     
     
     def my_collate_fn(batch):
-        return pad_zip(batch)
+        return pad_zip(*batch)
 
     # must set shuffle=False, persistent_workers=False (because worker is in another thread)
     data_loader = DataLoader(train_data, shuffle=False, pin_memory=True, batch_size=args.micro_bsz, num_workers=1, persistent_workers=False, drop_last=True)
