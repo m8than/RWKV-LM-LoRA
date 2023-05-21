@@ -54,6 +54,18 @@ class MyDataset(Dataset):
                 self.seq_indexes.pop()
                     
                 rank_zero_info(f"Data has {len(self.seq_indexes)} documents.")
+                
+                rank_zero_info("Merging documents to minimum ctx_len...")
+                
+                # loop through indexes removing indexes that are too close to the previous one
+                i = 0
+                while i < len(self.seq_indexes) - 1:
+                    if self.seq_indexes[i+1] - self.seq_indexes[i] < (int(args.min_ctx_len) if int(args.min_ctx_len) > 0 else int(args.ctx_len) // 2):
+                        self.seq_indexes.pop(i+1)
+                    else:
+                        i += 1
+                
+                rank_zero_info(f"Data has {len(self.seq_indexes)} documents (post merge).")
 
             # if args.chatml_mask > 0:
             #     self.data_pile = MMapIndexedDataset('/fsx/BlinkDL/pile/pile_20B_tokenizer_text_document')

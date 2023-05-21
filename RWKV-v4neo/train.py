@@ -104,6 +104,7 @@ if __name__ == "__main__":
     parser.add_argument("--load_partial", default=0, type=int)
     parser.add_argument("--magic_prime", default=0, type=int)
     parser.add_argument("--chatml_mask", default=0, type=int)
+    parser.add_argument("--min_ctx_len", default=0, type=int)
     parser.add_argument("--seq_data", default=0, type=int)
     parser.add_argument("--seq_data_sep", default=0, type=int)
     parser.add_argument("--my_testing", default='', type=str)
