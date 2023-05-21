@@ -370,7 +370,7 @@ if __name__ == "__main__":
         trainer.strategy.config["zero_optimization"]["reduce_bucket_size"] = args.ds_bucket_mb * 1000 * 1000
     
     # fix this shit ffffsssss
-    def pad_zip(*sequences, pad_value=None):
+    def pad_zip(*sequences):
         sequences = list(sequences)
         new_sequences = []
         for j in range(len(sequences)):
@@ -380,7 +380,7 @@ if __name__ == "__main__":
                 length = max(int(batch[i].size(0)) for bch in sequences)
                 new_batch.append(torch.cat((batch[i], torch.zeros(length, dtype=batch[i].dtype))))
             new_sequences.append(new_batch)
-        return zip(*tuple(new_sequences))
+        return tuple(new_sequences)
     
     def my_collate_fn(batch):
         return pad_zip(*batch)
