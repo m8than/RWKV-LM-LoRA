@@ -581,6 +581,7 @@ class RWKV(pl.LightningModule):
             logits = self(idx)
             loss = F.cross_entropy(logits.view(-1, logits.size(-1)), targets.view(-1))
         else:
+            print(batch)
             idx, targets, mask = batch
             mask = mask.view(-1)
             sum_mask = torch.sum(mask).item()
