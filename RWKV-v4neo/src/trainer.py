@@ -113,7 +113,8 @@ class train_callback(pl.Callback):
                 lll = {"loss": trainer.my_loss, "lr": trainer.my_lr, "Gtokens": self.total_tokens / 1e9}
                 
                 if args.seq_data > 0:
-                    lll["documents"] = registry.total_documents
+                    total_documents = int(real_step * args.real_bsz)
+                    lll["documents"] = total_documents
                 
                 if kt_s > 0:
                     lll["kt/s"] = kt_s
