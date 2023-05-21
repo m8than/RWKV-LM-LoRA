@@ -2,10 +2,6 @@
 # The RWKV Language Model - https://github.com/BlinkDL/RWKV-LM
 ########################################################################################################
 
-import src.registry
-
-# create object to store registry of data
-src.registry.initRegistry()
 if __name__ == "__main__":
     from argparse import ArgumentParser
     from pytorch_lightning import Trainer

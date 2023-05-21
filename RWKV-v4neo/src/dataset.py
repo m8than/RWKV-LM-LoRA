@@ -9,7 +9,6 @@ from torch.utils.data import Dataset
 from pytorch_lightning.utilities import rank_zero_info
 from .binidx import MMapIndexedDataset
 from .utils import MaybeIsPrime
-from src.registry import registry
 
 
 class MyDataset(Dataset):
@@ -130,7 +129,7 @@ class MyDataset(Dataset):
         world_size = self.world_size
         
         docs_per_epoch = args.real_bsz * args.epoch_steps
-        registry.total_documents = int(epoch * docs_per_epoch + idx)
+        total_documents = int(epoch * docs_per_epoch + idx)
         if args.data_type == "wds_img":
             def init_wds(self, bias=0):
                 def identity(x):
@@ -211,24 +210,20 @@ class MyDataset(Dataset):
 
                 if args.data_type == "binidx":
                     if args.seq_data != 0:
-                        cur_doc_id = registry.total_documents % len(self.seq_indexes)
+                        cur_doc_id = total_documents % len(self.seq_indexes)
                             
                         ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
-                        registry.last_ctx_length = ctx_len
                         dix = data.get(idx=0, offset=self.seq_indexes[cur_doc_id], length=req_len).astype(int)
-                        registry.last_token_lengths.append(ctx_len)
                     else:
                         dix = data.get(idx=0, offset=i, length=req_len).astype(int)
                 elif args.data_type == "numpy":
                     if args.seq_data != 0:
-                        cur_doc_id = registry.total_documents % len(self.seq_indexes)
+                        cur_doc_id = total_documents % len(self.seq_indexes)
                             
                         ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
-                        registry.last_ctx_length = ctx_len
                         dix = data[self.seq_indexes[cur_doc_id] : self.seq_indexes[cur_doc_id] + req_len]
-                        registry.last_token_lengths.append(ctx_len)
                     else:
                         dix = data[i : i + req_len]
                 else:
