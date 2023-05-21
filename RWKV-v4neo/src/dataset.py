@@ -57,13 +57,12 @@ class MyDataset(Dataset):
                 
                 rank_zero_info("Merging documents to minimum ctx_len...")
                 
-                # loop through indexes removing indexes that are too close to the previous one
-                i = 0
-                while i < len(self.seq_indexes) - 1:
-                    if self.seq_indexes[i+1] - self.seq_indexes[i] < (int(args.min_ctx_len) if int(args.min_ctx_len) > 0 else int(args.ctx_len) // 2):
-                        self.seq_indexes.pop(i+1)
-                    else:
-                        i += 1
+                new_batch = [self.seq_indexes[0]]
+                for i in range(len(self.seq_indexes) - 1):
+                    if self.seq_indexes[i+1] - new_batch[-1] >= 4096:
+                        new_batch.append(self.seq_indexes[i+1])
+                        
+                self.seq_indexes = new_batch
                 
                 rank_zero_info(f"Data has {len(self.seq_indexes)} documents (post merge).")
 
