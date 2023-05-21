@@ -2,6 +2,9 @@
 # The RWKV Language Model - https://github.com/BlinkDL/RWKV-LM
 ########################################################################################################
 
+from RWKV-LM-LoRA.RWKV-v4neo.src.registry import Registry
+
+
 if __name__ == "__main__":
     from argparse import ArgumentParser
     from pytorch_lightning import Trainer
@@ -284,11 +287,7 @@ if __name__ == "__main__":
     from src.dataset import MyDataset
     
     # create object to store registry of data
-    registry = {
-        'last_token_lengths': [],
-        'last_ctx_length': 0,
-        'total_documents': 0
-    }
+    registry = Registry()
 
     train_data = MyDataset(args, registry)
     args.vocab_size = train_data.vocab_size
