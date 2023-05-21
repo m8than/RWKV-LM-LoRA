@@ -85,7 +85,6 @@ class train_callback(pl.Callback):
         args = self.args
         if trainer.is_global_zero:  # logging
             t_now = time.time_ns()
-            total_documents = -1
             real_step = trainer.global_step + args.epoch_begin * args.epoch_steps
             if args.seq_data > 0:
                 token_per_step = sum(self.registry.last_token_lengths)
@@ -114,7 +113,7 @@ class train_callback(pl.Callback):
                 lll = {"loss": trainer.my_loss, "lr": trainer.my_lr, "Gtokens": self.total_tokens / 1e9}
                 
                 if args.seq_data > 0:
-                    lll["documents"] = total_documents
+                    lll["documents"] = self.registry.total_documents
                 
                 if kt_s > 0:
                     lll["kt/s"] = kt_s
