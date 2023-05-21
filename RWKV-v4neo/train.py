@@ -380,6 +380,8 @@ if __name__ == "__main__":
                 length = max(int(bch[i].size(0)) for bch in sequences)
                 new_batch.append(torch.cat((batch[i], torch.zeros(length, dtype=batch[i].dtype))))
             new_sequences.append(new_batch)
+            
+        print(new_sequences)
         return zip(*tuple(new_sequences))
     
     def my_collate_fn(batch):
