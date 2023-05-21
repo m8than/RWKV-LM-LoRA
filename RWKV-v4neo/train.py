@@ -375,11 +375,7 @@ if __name__ == "__main__":
 
     def pad_zip(*sequences):
         sequences = list(sequences)
-        new_sequences = [
-            torch.empty(0),
-            torch.empty(0),
-            torch.empty(0)
-        ]
+        new_sequences = [torch.empty(0)] * len(sequences[0])
         for j in range(len(sequences)):
             batch = sequences[j]
             for i in range(len(batch)):
