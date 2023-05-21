@@ -371,15 +371,14 @@ if __name__ == "__main__":
     
     # fix this shit ffffsssss
     def pad_zip(*sequences, pad_value=None):
-        print(sequences)
         sequences = list(sequences)
         new_sequences = []
         for j in range(len(sequences)):
             batch = sequences[j]
             new_batch = []
             for i in range(len(batch)):
-                length = max(int(bch[i].size()[0]) for bch in sequences)
-                new_batch.append(torch.nn.functional.pad(batch[i], (0, length), mode='constant', value=0))
+                length = max(int(batch[i].size(0)) for bch in sequences)
+                new_batch.append(torch.cat((batch[i], torch.zeros(length, dtype=batch[i].dtype))))
             new_sequences.append(new_batch)
         return zip(*tuple(new_sequences))
     
