@@ -169,10 +169,7 @@ class train_callback(pl.Callback):
                 except Exception as e:
                     print('Error\n\n', e, '\n\n')
             
-            if args.seq_data > 0:
-                trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch} {self.total_tokens} {self.registry.total_documents}\n")
-            else:
-                trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch} {self.total_tokens}\n")
+            trainer.my_log.write(f"{args.epoch_begin + trainer.current_epoch} {trainer.my_epoch_loss:.6f} {math.exp(trainer.my_epoch_loss):.4f} {trainer.my_lr:.8f} {datetime.datetime.now()} {trainer.current_epoch} {self.total_tokens}\n")
             trainer.my_log.flush()
 
             trainer.my_loss_sum = 0
