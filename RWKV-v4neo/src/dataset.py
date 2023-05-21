@@ -131,10 +131,6 @@ class MyDataset(Dataset):
         
         docs_per_epoch = args.real_bsz * args.epoch_steps
         registry.total_documents = int(epoch * docs_per_epoch + idx)
-        print()
-        print(f"epoch {epoch} idx {idx} rank {rank}/{world_size}")
-        print(f"doc {registry.total_documents} ctx {registry.last_ctx_length}")
-
         if args.data_type == "wds_img":
             def init_wds(self, bias=0):
                 def identity(x):
