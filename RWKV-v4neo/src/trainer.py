@@ -100,6 +100,15 @@ class train_callback(pl.Callback):
                 self.log("Kt/s", kt_s, prog_bar=True, on_step=True)
             except:
                 pass
+            
+            docs_s = 0
+            try:
+                t_cost = (t_now - trainer.my_time_ns) / 1e9
+                total_documents = int(real_step * args.real_bsz)
+                docs_s = (total_documents - self.last_documents) / t_cost
+                self.log("Docs/s", docs_s, prog_bar=True, on_step=True)
+            except:
+                pass
             trainer.my_time_ns = t_now
             trainer.my_loss = trainer.my_loss_all.float().mean().item()
             trainer.my_loss_sum += trainer.my_loss
@@ -115,10 +124,6 @@ class train_callback(pl.Callback):
                 if args.seq_data > 0:
                     t_cost = (t_now - trainer.my_time_ns) / 1e9
                     total_documents = int(real_step * args.real_bsz)
-                    if t_cost > 0:
-                        docs_s = (total_documents - self.last_documents) / t_cost
-                    else:
-                        docs_s = 0
                     self.last_documents = total_documents
                     lll["documents"] = total_documents
                     lll["docs/s"] = docs_s
