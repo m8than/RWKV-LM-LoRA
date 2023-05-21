@@ -59,7 +59,7 @@ class MyDataset(Dataset):
                 
                 new_batch = [self.seq_indexes[0]]
                 for i in range(len(self.seq_indexes) - 1):
-                    if self.seq_indexes[i+1] - new_batch[-1] >= 4096:
+                    if self.seq_indexes[i+1] - new_batch[-1] >= (int(args.min_ctx_len) if int(args.min_ctx_len) > 0 else int(args.ctx_len) // 4):
                         new_batch.append(self.seq_indexes[i+1])
                         
                 self.seq_indexes = new_batch
