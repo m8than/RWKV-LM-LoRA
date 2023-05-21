@@ -255,10 +255,10 @@ class MyDataset(Dataset):
                             if isGood:
                                 z[i] = 1
                                 z_sum += 1
-                        if z_sum == 0:
-                            z = [1] * ctx_len
-                            i = np.random.randint(0, self.data_size - req_len)
-                            dix = self.data.get(idx=0, offset=i, length=req_len).astype(int)
+                        # if z_sum == 0:
+                        #     z = [1] * ctx_len
+                        #     i = np.random.randint(0, self.data_size - req_len)
+                        #     dix = self.data.get(idx=0, offset=i, length=req_len).astype(int)
                     z = torch.tensor(z, dtype=torch.bfloat16)
 
                 x = torch.tensor(dix[:-1], dtype=torch.long)
