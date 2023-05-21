@@ -221,7 +221,6 @@ class MyDataset(Dataset):
                         req_len = ctx_len + 1
                         registry.last_ctx_length = ctx_len
                         dix = data.get(idx=0, offset=self.seq_indexes[cur_doc_id], length=req_len).astype(int)
-                        registry.total_documents += 1
                         registry.last_token_lengths.append(ctx_len)
                     else:
                         dix = data.get(idx=0, offset=i, length=req_len).astype(int)
@@ -233,7 +232,6 @@ class MyDataset(Dataset):
                         req_len = ctx_len + 1
                         registry.last_ctx_length = ctx_len
                         dix = data[self.seq_indexes[cur_doc_id] : self.seq_indexes[cur_doc_id] + req_len]
-                        registry.total_documents += 1
                         registry.last_token_lengths.append(ctx_len)
                     else:
                         dix = data[i : i + req_len]
