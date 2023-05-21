@@ -371,6 +371,7 @@ if __name__ == "__main__":
     
     # fix this shit ffffsssss
     def pad_zip(*sequences, pad_value=None):
+        print(sequences)
         sequences = list(sequences)
         new_sequences = []
         for j in range(len(sequences)):
