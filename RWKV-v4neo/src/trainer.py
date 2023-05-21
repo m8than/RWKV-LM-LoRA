@@ -15,9 +15,10 @@ def my_save(dd, ff):
         subprocess.Popen(f" aws s3 mv {fff} s3://rwkv-14b-4k/{fn} --quiet", shell=True)
 
 class train_callback(pl.Callback):
-    def __init__(self, args):
+    def __init__(self, args, registry):
         super().__init__()
         self.args = args
+        self.registry = registry
         self.last_documents = 0
         self.total_tokens = 0
 
@@ -87,16 +88,13 @@ class train_callback(pl.Callback):
             total_documents = -1
             real_step = trainer.global_step + args.epoch_begin * args.epoch_steps
             if args.seq_data > 0:
-                dataset = trainer.train_dataloader.dataset.datasets
-                assert "MyDataset" in str(dataset)
-                
-                token_per_step = sum(dataset.last_token_lengths)
+                token_per_step = sum(self.registry.last_token_lengths)
                 self.total_tokens += token_per_step
-                total_documents = int(dataset.total_documents)
+                total_documents = int(self.registry.total_documents)
                 docs_per_step = total_documents - self.last_documents
                 self.last_documents = total_documents
-                self.log("Ctx", dataset.last_ctx_length, prog_bar=True, on_step=True)
-                dataset.last_token_lengths = []
+                self.log("Ctx", self.registry.last_ctx_length, prog_bar=True, on_step=True)
+                self.registry.last_token_lengths = []
                 self.log("Docs", total_documents, prog_bar=True, on_step=True)
             else:
                 token_per_step = args.ctx_len * args.real_bsz

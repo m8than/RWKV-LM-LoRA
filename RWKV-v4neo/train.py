@@ -282,8 +282,15 @@ if __name__ == "__main__":
 
     from src.trainer import train_callback, generate_init_weight
     from src.dataset import MyDataset
+    
+    # create object to store registry of data
+    registry = {
+        'last_token_lengths': [],
+        'last_ctx_length': 0,
+        'total_documents': 0
+    }
 
-    train_data = MyDataset(args)
+    train_data = MyDataset(args, registry)
     args.vocab_size = train_data.vocab_size
 
     if args.data_type == 'wds_img':
@@ -353,7 +360,7 @@ if __name__ == "__main__":
 
     trainer = Trainer.from_argparse_args(
         args,
-        callbacks=[train_callback(args)],
+        callbacks=[train_callback(args, registry)],
     )
 
     if trainer.global_rank == 0:
