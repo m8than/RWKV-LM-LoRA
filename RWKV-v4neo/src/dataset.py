@@ -224,18 +224,23 @@ class MyDataset(Dataset):
 
                 if args.data_type == "binidx":
                     if args.doc_training != 0:
-                        cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else np.random.randint(0, len(self.seq_indexes)-1)
-                            
-                        ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
+                        ctx_len = 0
+                        cur_doc_id = 0
+                        while ctx_len == 0 or ctx_len > args.ctx_len:
+                            cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else np.random.randint(0, len(self.seq_indexes)-1)
+                            ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
                         dix = data.get(idx=0, offset=self.seq_indexes[cur_doc_id], length=req_len).astype(int)
                     else:
                         dix = data.get(idx=0, offset=i, length=req_len).astype(int)
                 elif args.data_type == "numpy":
                     if args.doc_training != 0:
-                        cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else np.random.randint(0, len(self.seq_indexes)-1)
+                        ctx_len = 0
+                        cur_doc_id = 0
+                        while ctx_len == 0 or ctx_len > args.ctx_len:
+                            cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else np.random.randint(0, len(self.seq_indexes)-1)
+                            ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                             
-                        ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
                         dix = data[self.seq_indexes[cur_doc_id] : self.seq_indexes[cur_doc_id] + req_len]
                     else:
