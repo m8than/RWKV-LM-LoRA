@@ -142,6 +142,8 @@ class MyDataset(Dataset):
         epoch = self.real_epoch
         world_size = self.world_size
         
+        rng = np.random.RandomState(rank + epoch * 1000000 + idx)
+        
         docs_per_epoch = args.real_bsz * args.epoch_steps
         total_documents = int(epoch * docs_per_epoch + idx)
         if args.data_type == "wds_img":
@@ -220,14 +222,14 @@ class MyDataset(Dataset):
                     # print(f"epoch {epoch} idx {idx} rank {rank}/{world_size} ii {ii} pos {round(i / self.data_size, 3)}")
                 else:
                     # cheat: pick a random spot in dataset
-                    i = np.random.randint(0, self.data_size - req_len)
+                    i = rng.randint(0, self.data_size - req_len)
 
                 if args.data_type == "binidx":
                     if args.doc_training != 0:
                         ctx_len = 0
                         cur_doc_id = 0
                         while ctx_len == 0 or ctx_len > args.ctx_len:
-                            cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else np.random.randint(0, len(self.seq_indexes)-1)
+                            cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else rng.randint(0, len(self.seq_indexes)-1)
                             ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
                         dix = data.get(idx=0, offset=self.seq_indexes[cur_doc_id], length=req_len).astype(int)
@@ -238,7 +240,7 @@ class MyDataset(Dataset):
                         ctx_len = 0
                         cur_doc_id = 0
                         while ctx_len == 0 or ctx_len > args.ctx_len:
-                            cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else np.random.randint(0, len(self.seq_indexes)-1)
+                            cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else rng.randint(0, len(self.seq_indexes)-1)
                             ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                             
                         req_len = ctx_len + 1
