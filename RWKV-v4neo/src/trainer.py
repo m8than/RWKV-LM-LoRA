@@ -88,7 +88,7 @@ class train_callback(pl.Callback):
             real_step = trainer.global_step + args.epoch_begin * args.epoch_steps
             last_ctx_length = max(int(bch[0].size(0)) for bch in batch)
             if args.seq_data > 0:
-                token_per_step = sum(int(bch[0].size(0)) for bch in batch) * args.real_bsz
+                token_per_step = max(int(bch[0].size(0)) for bch in batch) * args.real_bsz
                 self.total_tokens += token_per_step
             else:
                 token_per_step = args.ctx_len * args.real_bsz
