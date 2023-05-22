@@ -105,8 +105,9 @@ if __name__ == "__main__":
     parser.add_argument("--magic_prime", default=0, type=int)
     parser.add_argument("--chatml_mask", default=0, type=int)
     parser.add_argument("--min_ctx_len", default=0, type=int)
-    parser.add_argument("--seq_data", default=0, type=int)
-    parser.add_argument("--seq_data_sep", default=0, type=int)
+    parser.add_argument("--doc_training", default=0, type=int)
+    parser.add_argument("--doc_sep", default=0, type=int)
+    parser.add_argument("--doc_training_seq", default=0, type=int)
     parser.add_argument("--my_testing", default='', type=str)
 
     parser.add_argument("--lora", action="store_true")
@@ -393,7 +394,7 @@ if __name__ == "__main__":
 
     # must set shuffle=False, persistent_workers=False (because worker is in another thread)
     data_loader = DataLoader(train_data, shuffle=False, pin_memory=True, batch_size=args.micro_bsz, num_workers=1, persistent_workers=False, drop_last=True)
-    if args.seq_data == 1 and (int(args.micro_bsz) > 1 or int(args.devices) > 1):
+    if args.doc_training == 1 and (int(args.micro_bsz) > 1 or int(args.devices) > 1):
         data_loader.collate_fn = my_collate_fn
         
     trainer.fit(model, data_loader)

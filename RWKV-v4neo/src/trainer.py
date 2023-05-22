@@ -87,7 +87,7 @@ class train_callback(pl.Callback):
             t_now = time.time_ns()
             real_step = trainer.global_step + args.epoch_begin * args.epoch_steps
             last_ctx_length = max(int(bch[0].size(0)) for bch in batch)
-            if args.seq_data > 0:
+            if args.doc_training > 0:
                 token_per_step = max(int(bch[0].size(0)) for bch in batch) * args.real_bsz
                 self.total_tokens += token_per_step
             else:
@@ -122,7 +122,7 @@ class train_callback(pl.Callback):
             if len(args.wandb) > 0:
                 lll = {"loss": trainer.my_loss, "lr": trainer.my_lr, "Gtokens": self.total_tokens / 1e9}
                 
-                if args.seq_data > 0:
+                if args.doc_training > 0:
                     t_cost = (t_now - trainer.my_time_ns) / 1e9
                     total_documents = int(real_step * args.real_bsz)
                     self.last_documents = total_documents

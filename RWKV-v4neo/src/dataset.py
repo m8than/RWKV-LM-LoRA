@@ -32,9 +32,9 @@ class MyDataset(Dataset):
                 self.data_size = len(self.data._bin_buffer) // 2
                 rank_zero_info(f"Data has {self.data_size} tokens.")
                 
-            if args.seq_data != 0:
-                # find all indexes of args.seq_data_sep and store their positions
-                sep_token = int(args.seq_data_sep)
+            if args.doc_training != 0:
+                # find all indexes of args.doc_sep and store their positions
+                sep_token = int(args.doc_sep)
                 self.seq_indexes = [0]
                 chunk_size = args.ctx_len * 30 if args.ctx_len * 10 < self.data_size else self.data_size
                 rank_zero_info("Preprocessing data...")
@@ -60,7 +60,10 @@ class MyDataset(Dataset):
                 new_batch = [self.seq_indexes[0]]
                 for i in range(len(self.seq_indexes) - 1):
                     if self.seq_indexes[i+1] - new_batch[-1] >= (int(args.min_ctx_len) if int(args.min_ctx_len) > 0 else int(args.ctx_len) // 4):
-                        new_batch.append(self.seq_indexes[i+1])
+                        if self.seq_indexes[i+1] - new_batch[-1] >= int(args.ctx_len):
+                            new_batch.append(self.seq_indexes[i])
+                        else:
+                            new_batch.append(self.seq_indexes[i+1])
                         
                 self.seq_indexes = new_batch
                 
@@ -220,8 +223,8 @@ class MyDataset(Dataset):
                     i = np.random.randint(0, self.data_size - req_len)
 
                 if args.data_type == "binidx":
-                    if args.seq_data != 0:
-                        cur_doc_id = total_documents % len(self.seq_indexes)
+                    if args.doc_training != 0:
+                        cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else np.random.randint(0, len(self.seq_indexes)-1)
                             
                         ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
@@ -229,8 +232,8 @@ class MyDataset(Dataset):
                     else:
                         dix = data.get(idx=0, offset=i, length=req_len).astype(int)
                 elif args.data_type == "numpy":
-                    if args.seq_data != 0:
-                        cur_doc_id = total_documents % len(self.seq_indexes)
+                    if args.doc_training != 0:
+                        cur_doc_id = total_documents % len(self.seq_indexes) if args.doc_training_seq == 1 else np.random.randint(0, len(self.seq_indexes)-1)
                             
                         ctx_len = self.seq_indexes[cur_doc_id + 1] - self.seq_indexes[cur_doc_id]
                         req_len = ctx_len + 1
