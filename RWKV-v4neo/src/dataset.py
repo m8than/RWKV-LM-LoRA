@@ -261,8 +261,8 @@ class MyDataset(Dataset):
                         z = [0] * ctx_len
                         z_sum = 0
                         isGood = False
-                        for i in range(3, ctx_len):
-                            if dix[i] == 187 and dix[i-1] == 50279 and dix[i-2] == 50277:
+                        for i in range(2, ctx_len):
+                            if dix[i] == 187 and dix[i-1] == 50279:
                                 isGood = True
                             if dix[i] == 50278:
                                 isGood = False
